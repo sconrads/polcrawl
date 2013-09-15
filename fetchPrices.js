@@ -17,23 +17,60 @@ function download(url, callback) {
   });
 }
 
-var url = "http://www.vinmonopolet.no/vareutvalg/sok?query=*&sort=2&sortMode=0&page=1&filterIds=25&filterValues=R%C3%B8dvin"
-
-download(url, function(data) {
+for (var i=0;i<200;i++)
+{ 
+  var page = i+1;
+  var url = "http://www.vinmonopolet.no/vareutvalg/sok?query=*&sort=2&sortMode=0&filterIds=25&filterValues=R%C3%B8dvin&page=" + page;
+  console.log(url);
+  download(url, function(data) {
   if (data) {
     //console.log(data);
-    $ = cheerio.load(data);
-    $('.product').each(function() {
-      console.log($(this).text());
+    var list = cheerio.load(data);
+
+    // Loop all products in list
+    list('.product').each(function() {
       
-      $(this).parent().next('p').each(function() {
-        console.log($(this).text());    
+      // Product name
+      //var productName = list(this).text();
+      //console.log(productName);
+
+      // href to product details
+      var urlDetails = list(this).attr("href");
+      //console.log(urlDetails);
+
+      download(urlDetails, function(data) {
+        if (data) {
+          //console.log(data);
+          var details = cheerio.load(data);
+
+          details('.head').each(function(){
+            var productName = details(this).find('h1').text();
+            console.log(productName);
+          });
+
+          details('.price').each(function(){
+            var price = details(this).find('strong').text();
+            console.log(price);
+          });
+
+          details('.productData').each(function(){
+            var productId = details(this).find('li').first().find('.data').text(); 
+            console.log(productId);
+          });    
+        }
+        else console.log("error");  
       });
+      
+      // Product type and id
+      //list(this).parent().next('p').each(function() {
+      //  console.log(list(this).text());    
+      //});
 
     });
 
   }
   else console.log("error");  
-});
+  });
+}
 
 
