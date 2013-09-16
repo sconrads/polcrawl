@@ -60,47 +60,61 @@ for (var i = 0; i < productTypes.length; i++)
             details('.productData').each(function(){
 
               // Product id
-              var productIdObject = details(this).find('li').first().find('.data'); 
+              var productIdObject = details(this).find("li").first().find('.data'); 
               productId = productIdObject.text(); 
               //console.log(productId);
 
               // Type
-              var productTypeObject = productIdObject.parent().next().find('.data'); 
+              var productTypeObject = productIdObject.parent().next("li").find('.data'); 
               productType = productTypeObject.text(); 
               //console.log(productType);
 
               // Product choice
-              var productChoiceObject = productTypeObject.parent().next().find('.data'); 
+              var productChoiceObject = productTypeObject.parent().next("li").find('.data'); 
               productChoice = productChoiceObject.text(); 
               //console.log(productChoice);
 
               // Contry
-              var contryObject = productChoiceObject.parent().next().next().next().next().next().next().next().find('.data'); 
-              contry = contryObject.text(); 
-              //console.log(contry);
+              productIdObject.parent().parent().find('.attrib').each(function(){
+                //console.log(details(this).text() + '\n');
+                if ( details(this).text() == "Land/distrikt:" )
+                {
+                  var contryObject = details(this).next();
+                  contry = contryObject.text(); 
+                  //console.log(contry);
+                }
+              });
 
             });  
 
-            // JSON object for product including price
-            var productPrice = {
-              id : productId.trim(),
-              name : productName.trim(),
-              type : productType.trim(),
-              choice : productChoice.trim(),
-              volume : volume.replace('(',"").replace(')',"").trim(),
-              contry : contry.replace(/(\r\n|\n|\r)/gm,"").trim(),
-              price : price.replace(/(\r\n|\n|\r)/gm,"").replace('Kr.',"").trim(),
-              time : fetchtime
-            }
+            // The price and fetch time JSON object
+            var priceJson = {
+                              price : price.replace(/(\r\n|\n|\r)/gm,"").replace('Kr.',"").trim(),
+                              time : fetchtime
+                            };
 
+            // Gets the MongoDB collection pol
             var polData = db.get('pol');
-            polData.insert(productPrice
-              ,function (err, doc) {
-                if (err) {
-                    console.log("There was a problem adding the information to the database.");
-              }
-            });
-
+           
+            // Tries to update with new prices, if product do not exists, it will be inserted
+            polData.update( {
+                                _id : productId.trim(),
+                                name : productName.trim(),
+                                type : productType.trim(),
+                                choice : productChoice.trim(),
+                                volume : volume.replace('(',"").replace(')',"").trim(),
+                                contry : contry.replace(/(\r\n|\n|\r)/gm,"").trim() 
+                              },
+                { 
+                  $push: { prices:  priceJson } 
+                },
+                 { upsert: true }
+                ,function (err, doc) {
+                  if (err) {
+                      console.log("There was a problem adding the information to the database.");
+                  }
+                });
+           
           }
           else console.log("error");  
         });
