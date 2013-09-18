@@ -118,6 +118,7 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
                     if (err) {
                         console.log("There was a problem adding the information to the database.");
                     }
+                    callbackPages();
                   });              
             }
             else console.log("error");  
@@ -125,8 +126,7 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
         });        
       }
       else console.log("error");  
-      }); 
-      callbackPages();
+      });       
   }, function(err) {
     console.log('> done');
   });   
