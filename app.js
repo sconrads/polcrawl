@@ -50,7 +50,7 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
               // Product name
               details('.head').each(function(){
                 productName = details(this).find('h1').text();
-                //console.log(productName);
+                console.log(productName);
               });
 
               // Price and volume
@@ -118,7 +118,9 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
                     if (err) {
                         console.log("There was a problem adding the information to the database.");
                     }
-                    callbackPages();
+		    else {
+		     callbackPages();
+			}
                   });              
             }
             else console.log("error");  
