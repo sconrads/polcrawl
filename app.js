@@ -21,7 +21,7 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
   }
 
   // Loop each page for every product type. There are 187 pages for Red Wine by 15.09.2013
-  async.forEachLimit(pages, 10, function(page, callback) {
+  async.forEachLimit(pages, 10, function(page, callbackPages) {
 
       // The search query
       var url = "http://www.vinmonopolet.no/vareutvalg/sok?query=*&sort=2&sortMode=0&filterIds=25&filterValues=" + productItem + "&page=" + page;
@@ -118,21 +118,19 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
                     if (err) {
                         console.log("There was a problem adding the information to the database.");
                     }
-                  });
-             
+                  });              
             }
             else console.log("error");  
           });
-        });
-
+        });        
       }
       else console.log("error");  
       }); 
-
+      callbackPages();
   }, function(err) {
     console.log('> done');
   });   
-
+  callback();
 }, function(err) {
   console.log('> done');
 });
