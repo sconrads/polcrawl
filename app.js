@@ -16,12 +16,12 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
 
   // Create an array from 1 to 200. Used to navigate to each product list page 
   var pages = [];
-  for (var i = 1; i <= 200; i++) {
+  for (var i = 1; i <= 1; i++) {
     pages.push(i);
   }
 
   // Loop each page for every product type. There are 187 pages for Red Wine by 15.09.2013
-  async.forEachLimit(pages, 10, function(page, callbackPages) {
+  async.forEachLimit(pages, 200, function(page, callbackPages) {
 
       // The search query
       var url = "http://www.vinmonopolet.no/vareutvalg/sok?query=*&sort=2&sortMode=0&filterIds=25&filterValues=" + productItem + "&page=" + page;
@@ -118,10 +118,10 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
                     if (err) {
                         console.log("There was a problem adding the information to the database.");
                     }
-		    else {
-		     callbackPages();
-			}
-                  });              
+		                else {
+		                  callbackPages();
+			              }
+                  });             
             }
             else console.log("error");  
           });
@@ -130,12 +130,25 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
       else console.log("error");  
       });       
   }, function(err) {
-    console.log('> done');
+    console.log('> done product');
   });   
   callback();
 }, function(err) {
-  console.log('> done');
+  console.log('> done type');
 });
+
+process.on('exit', function() {
+   db.close(); 
+   console.log('Exiting'); 
+   process.exit(0);
+});
+
+process.on('SIGINT', function() {
+   db.close(); 
+   console.log('Got a SIGINT. Exiting'); 
+   process.exit(0);
+});
+
 
 // Utility function that downloads a URL and invokes
 // callback with the data.
