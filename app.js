@@ -16,7 +16,7 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
 
   // Create an array from 1 to 200. Used to navigate to each product list page 
   var pages = [];
-  for (var i = 1; i <= 1; i++) {
+  for (var i = 1; i <= 200; i++) {
     pages.push(i);
   }
 
@@ -103,20 +103,20 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
              
               // Tries to update with new prices, if product do not exists, it will be inserted
               polData.update( {
-                                  _id : productId.trim(),
-                                  name : productName.trim(),
-                                  type : productType.trim(),
-                                  choice : productChoice.trim(),
-                                  volume : volume.replace('(',"").replace(')',"").trim(),
-                                  contry : contry.replace(/(\r\n|\n|\r)/gm,"").trim() 
-                                },
+                                  _id : productId.trim()
+                              },
                   { 
+                    $set: { name: productName.trim() },
+                    $set: { type: productType.trim() },
+                    $set: { choice: productChoice.trim() },
+                    $set: { volume: volume.replace('(',"").replace(')',"").trim() },
+                    $set: { contry: contry.replace(/(\r\n|\n|\r)/gm,"").trim() },
                     $push: { prices:  priceJson } 
                   },
                    { upsert: true }
                   ,function (err, doc) {
                     if (err) {
-                        console.log("There was a problem adding the information to the database.");
+                        console.log("There was a problem adding the information to the database: " + err);
                     }
 		                else {
 		                  callbackPages();
