@@ -111,6 +111,7 @@ async.forEachLimit(productTypes, 1, function(productItem, callback) {
                     $set: { choice: productChoice.trim() },
                     $set: { volume: volume.replace('(',"").replace(')',"").trim() },
                     $set: { contry: contry.replace(/(\r\n|\n|\r)/gm,"").trim() },
+                    $set: { url: urlDetails.substr(0,urlDetails.indexOf(";"))},
                     $push: { prices:  priceJson } 
                   },
                    { upsert: true }
